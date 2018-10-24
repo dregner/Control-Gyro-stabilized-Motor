@@ -43,7 +43,7 @@ Obs = obsv(A,C)
 rank(Obs)
 
 %% DIstrecizacao Planta
-Ts = 1/(20*3);
+Ts = 4/(20*3);
 [Ad, Bd] = c2d(A,B,Ts);
 
 %% LQR for R.L.
@@ -65,7 +65,7 @@ V1 = 10e-7*eye(3);
 V2 = 50e-7*eye(2);
 rkf = 0.001;
 Ldkf = dlqr(Ad',C', V1, rkf*V2)';
-Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
+%Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
 
 %% PLOTS
 %close all
