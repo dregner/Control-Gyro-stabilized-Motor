@@ -33,51 +33,39 @@ A = double(subs(jacobian(f),[x1 x2],[0 0]));
 B = double(subs(u, [x1 x2],[0 0]));
 C = [1 0 0;
     0 1 0 ];
-D = zeros(3,1);
-x0 = [pi/180*180 0 0];
+D = zeros(2,1);
+x0 = [pi/180*45 0 0];
 P1 = [-12.01 -12.02 -12];
 K = place(A,B,P1);
 Con = ctrb(A,B)
 rank(Con)
 Obs = obsv(A,C)
 rank(Obs)
-%% Controle realimentação de estados
 
-% Verifica a controlabilidade do Sistema Aumentado
-Con = ctrb(A,B)
-vsCon = rank(Con)
+%% DIstrecizacao Planta
+Ts = 1/(20*3);
+[Ad, Bd] = c2d(A,B,Ts);
 
-r = .5;
-R = r;
+%% LQR for R.L.
 Q = eye(3);
-Ka = lqr(A, B, Q, R)
+rf=0.3;
+R=rf*eye(1)
+Kd = dlqr(Ad,Bd,Q,R)
+%Kd = place(Ad, Bd, [-0.7239 + 1.0219i,-0.7239 - 1.0219i,1])
 
-polos = eig(A-B*Ka)
+%% Ganhos LQG para L
+x0_obs = [pi/180*45 0 0];
 
-%% Observador
-
-
-% Verifica a observabilidade da Planta
-Obs = obsv(A,C)
-vsObs = rank(Obs)
-
-x0obs = [pi/4 ; 0; 0];  
-
-pd = -10;
-L=place(A',C',[pd pd-0.05 pd-0.03])';        % polo duplo de A-LC em s=-12     
-
-%% Ruido
-x0obs = [pi/180*45 ; 0; 0];  
-x0 = [pi/180*45 0 0];
-
-rl = 1;
-V1 = 0.0001*eye(3);
-V2 = 0.000005*eye(2);
-
-Lkf = lqr(A',C',V1,rl*V2); 
-Lkf = Lkf'
-eig(A-Lkf*C)
-L = Lkf;
+Q = eye(3);
+ro=0.01;
+R=ro*eye(2)
+Ld = dlqr(Ad',C',Q,R)'
+    
+V1 = 10e-7*eye(3);
+V2 = 50e-7*eye(2);
+rkf = 0.001;
+Ldkf = dlqr(Ad',C', V1, rkf*V2)';
+Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
 
 %% PLOTS
 %close all
@@ -92,9 +80,9 @@ L = Lkf;
 % figure
 % plot3(xe(2,:),xe(3,:),xe(4,:))
 % figure
-x0 = [pi/180*30 0 0];
-hold on
-plot3(xe1(2,:),xe1(3,:),xe1(4,:))
+% x0 = [pi/180*30 0 0];
+% hold on
+% plot3(xe1(2,:),xe1(3,:),xe1(4,:))
 % figure(3)
 % plot(tout,x1(:,2),'r-',tout,x1(:,3),'b-',tout,x1(:,4),'g-') % plot estados
 % hold on
@@ -106,15 +94,15 @@ plot3(xe1(2,:),xe1(3,:),xe1(4,:))
 % plot(tout(1,, y1(:,2),tout,y1(:,3))
 % grid
 % title('Controlador-Observador');
-figure(3)
-plot(tout,xobs(:,5),'r-',tout,xobs(:,4),'b-') % plot estados
-hold on
-plot(tout,xobse(:,2),'r--',tout,xobse(:,3),'b--',tout,xobse(:,4),'g--') % plot estados
-hold off
-grid
-legend('x1','x2','x3','x1e','x2e','x3e');
-title('Controlador Observador')
-figure(4)
-plot(tout,yobs(:,2),tout,yobs(:,3))
-grid
-legend('y','u');
+% figure(3)
+% plot(tout,xobs(:,5),'r-',tout,xobs(:,4),'b-') % plot estados
+% hold on
+% plot(tout,xobse(:,2),'r--',tout,xobse(:,3),'b--',tout,xobse(:,4),'g--') % plot estados
+% hold off
+% grid
+% legend('x1','x2','x3','x1e','x2e','x3e');
+% title('Controlador Observador')
+% figure(4)
+% plot(tout,yobs(:,2),tout,yobs(:,3))
+% grid
+% legend('y','u');
