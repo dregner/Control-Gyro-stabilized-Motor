@@ -23,8 +23,8 @@ const int offset_servo = 85; /* Valor, em graus, que deixa o
                                 Utilizar o programa teste_servo
                                 para determinar o valor.
                              */
-const int servo_maximo = 125; //  Limite superior da atuação do servo
-const int servo_minimo = 45;  //  Limite inferior da atuação do servo
+const int servo_maximo = 127; //  Limite superior da atuação do servo
+const int servo_minimo = 47;  //  Limite inferior da atuação do servo
                               //  Novamente, utilize o arquivo teste_servo
                               //  para determinar o menor e maior valor para atuar
 
@@ -66,13 +66,13 @@ const bool inverter_imu = false; //  Análogo ao inverter_direcao_servo. Ajustar
 //const float K2 = -3.1623;
 //const float K3 = -3.2248;
 //r = 0.5
-//const float K1 =  -4.1377;
-//const float K2 = -1.4142;
-//const float K3 = -1.4636;
+const float K1 =  -4.1377;
+const float K2 = -1.4142;
+const float K3 = -1.4636;
 //r = 0.3
-const float K1 =  -4.8461;
-const float K2 = -1.8257;
-const float K3 = -1.8769;
+//const float K1 =  -4.8461;
+//const float K2 = -1.8257;
+//const float K3 = -1.8769;
 
 const int Ts =  10;  // Período de amostragem, em ms.
 const int Ts1 = 0.01;    // Menor valor aconselhado 5ms
