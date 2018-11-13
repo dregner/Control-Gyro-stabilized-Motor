@@ -31,3 +31,35 @@ LgLfh2 = h22*B
 
 Aa = [LgLfh1;LgLfh2]
 aa = [Lfh1, Lf2h1;Lfh2,Lf2h2]
+
+%%
+
+y1 = cos(th1)+cos(th1+th2);
+y2 = sin(th1)+sin(th1+th2);
+
+% derivada de lee primeira saida
+
+h11 = jacobian(y1,[th1,th2,dth1,dth2]);
+Lfh1 = simplify(h11*A);
+h12 = jacobian(Lfh1,[th1,th2,dth1,dth2]);
+Lf2h1 = simplify(h12*A); 
+Lglfh1 = simplify(h12*B);
+
+% derivada de lee segunda saida
+h21 = jacobian(y2,[th1,th2,dth1,dth2]);
+Lfh2 = simplify(h21*A);
+h22 = jacobian(Lfh2,[th1,th2,dth1,dth2]);
+Lf2h2 = simplify(h22*A); 
+Lglfh2 = simplify(h22*B);
+
+al = simplify([Lfh1, Lf2h1; Lfh2, Lf2h2]);
+Al = simplify([Lglfh1;Lglfh2]);
+
+detA = simplify(det(Al));
+
+%%
+clear all
+
+polo = -10
+
+F = [polo polo 0 0; 0 0 polo polo];
