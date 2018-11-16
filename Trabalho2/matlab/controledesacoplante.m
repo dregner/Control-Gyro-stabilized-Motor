@@ -28,4 +28,11 @@ a = [(-5*g+2*dth1^2*cos(th1)+4*cos(th1+th2)*dth1^2+8*dth1*cos(th1+th2)*dth2+4*co
     else
         u = (inv(A))*((-a)+d2y+v);
     end
+    if (u >= 100)
+        u = 100;
+    end
+    if(u <= -100)
+        u = -100;
+    end
+     
 out = [u(1);u(2)];

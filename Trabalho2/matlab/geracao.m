@@ -1,8 +1,8 @@
 function [out] = geracao(x);
 t = x;
 A = 1;
-B = 1;
-C = 0;
+B = 0;
+C = 1;
 
 yr1 = A*sin(t)+C;
 yr2 = A*cos(t)+B;

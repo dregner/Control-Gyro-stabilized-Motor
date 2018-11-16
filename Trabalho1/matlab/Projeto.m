@@ -11,7 +11,7 @@ Av = 0.075; % Altura veículo [m]
 Lv = 0.19; % Largura veículo [m]
 Dg = 0.06; % Distância entre centro de massa do giro e eixo de rotação [m]
 Dv = 0.045; % Distância entre centro de massa do veículo e eixo de rotação
-Omega = 7200*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
+Omega = 6500*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
 g = 9.81; % Gravidade [m/s^2] 
 IG11 = Mg*(Rg^2)/4 + Mg*(Ag^2)/12; % Algum momento de inercia
 IG33 = Mg*(Rg^2)/2;
@@ -47,7 +47,7 @@ rank(Obs)
 Con = ctrb(A,B)
 vsCon = rank(Con)
 
-r = .5;
+r = .4;
 R = r;
 Q = eye(3);
 Ka = lqr(A, B, Q, R)
@@ -65,7 +65,7 @@ x0obs = [pi/4 ; 0; 0];
 
 pd = -10;
 L=place(A',C',[pd pd-0.05 pd-0.03])';        % polo duplo de A-LC em s=-12     
-
+L =lqr(A',C',eye(3),0.001*eye(2))'
 %% Ruido
 x0obs = [pi/180*45 ; 0; 0];  
 x0 = [pi/180*45 0 0];

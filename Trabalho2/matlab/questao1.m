@@ -11,7 +11,7 @@ Av = 0.075; % Altura veículo [m]
 Lv = 0.19; % Largura veículo [m]
 Dg = 0.06; % Distância entre centro de massa do giro e eixo de rotação [m]
 Dv = 0.045; % Distância entre centro de massa do veículo e eixo de rotação
-Omega = 7200*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
+Omega = 6500*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
 g = 9.81; % Gravidade [m/s^2] 
 IG11 = Mg*(Rg^2)/4 + Mg*(Ag^2)/12; % Algum momento de inercia
 IG33 = Mg*(Rg^2)/2;
@@ -43,14 +43,15 @@ Obs = obsv(A,C)
 rank(Obs)
 
 %% DIstrecizacao Planta
-Ts = 4/(20*3);
+Ts = 1/(20*3);
 [Ad, Bd] = c2d(A,B,Ts);
 
 %% LQR for R.L.
 Q = eye(3);
-rf=0.3;
-R=rf*eye(1)
+rf=0.7;
+R=rf*eye(1);
 Kd = dlqr(Ad,Bd,Q,R)
+eig(Ad-Bd*Kd)
 %Kd = place(Ad, Bd, [-0.7239 + 1.0219i,-0.7239 - 1.0219i,1])
 
 %% Ganhos LQG para L
@@ -58,9 +59,9 @@ x0_obs = [pi/180*45 0 0];
 
 Q = eye(3);
 ro=0.01;
-R=ro*eye(2)
+R=ro*eye(2);
 Ld = dlqr(Ad',C',Q,R)'
-    
+eig(Ad-Ld*C);
 V1 = 10e-7*eye(3);
 V2 = 50e-7*eye(2);
 rkf = 0.001;

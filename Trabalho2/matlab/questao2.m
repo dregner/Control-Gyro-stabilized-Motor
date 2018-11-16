@@ -63,3 +63,13 @@ clear all
 polo = -10
 
 F = [polo polo 0 0; 0 0 polo polo];
+
+%%
+
+%dde = k1de + k0e
+
+A = [0 1;
+     0 0]
+ B = [0;1];
+ r = 0.001
+ lqr(A,B,eye(2),r)

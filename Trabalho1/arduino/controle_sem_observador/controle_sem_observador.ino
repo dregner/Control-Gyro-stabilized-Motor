@@ -65,23 +65,36 @@ const bool inverter_imu = false; //  Análogo ao inverter_direcao_servo. Ajustar
 //const float K1 =  -7.2448;
 //const float K2 = -3.1623;
 //const float K3 = -3.2248;
-//r = 0.5
-const float K1 =  -4.1377;
-const float K2 = -1.4142;
-const float K3 = -1.4636;
-//r = 0.3
+//r = 0.3 valores rpm = 7200
 //const float K1 =  -4.8461;
 //const float K2 = -1.8257;
 //const float K3 = -1.8769;
+//r = 0.4 valores rpm = 6500 FUNCIONANDO REDONDO (23hrs 14/11)
+//const float K1 =  -4.7122;
+//const float K2 = -1.5811;
+//const float K3 = -1.6387;
+//r = 0.7 valores rpm = 6500
+//const float K1 =  -4.0488;
+//const float K2 = -1.1952;
+//const float K3 = -1.2527;
 
-const int Ts =  10;  // Período de amostragem, em ms.
-const int Ts1 = 0.01;    // Menor valor aconselhado 5ms
+//K DISCRETO r = 0.7
+const float K1 = -2.6341;
+const float K2 = -0.5648;
+const float K3 = -0.6174;
+
+
+const int Ts =  5;  // Período de amostragem, em ms.
+const int Ts1 = 5;    // Menor valor aconselhado 5ms
 
 // Opções de visualização
-const bool plotar_referencia = true;
+const bool plotar_referencia = false;
 const bool plotar_x1 = true;
 const bool plotar_x2 = true;
 const bool plotar_x3 = true;
+const bool plotar_x1e = true;
+const bool plotar_x2e = true;
+const bool plotar_x3e = true;
 const bool plotar_atuacao_min_max = false;
 
 //  ======= FIM DAS CONFIGURAÇÕES =========
@@ -91,7 +104,8 @@ Mpu6050 imu;
 Servo atuador;
 Servo giroscopio;
 unsigned long tempo_ultimo_controle;
-float x1, x2, x3, xd1, xd2, xd3, xe1, xe2, xe3, y1, y2;
+float x1, x2, x3;
+double x1d,x2d,x3d, xe1, xe2, xe3, y1, y2;
 float du, dt;
 float theta = 0;
 float u;
@@ -107,7 +121,11 @@ void setup() {
     Serial.end();
     while(true);
   }
-
+  //Condicoes Iniciais
+    x1 = 0.29;
+    x2 = theta;
+    x3 = 0;
+    
   imu.SetXPosOffset(offset_posicao_x);
   imu.SetYPosOffset(offset_posicao_y); 
   imu.SetXSpeedOffset(offset_velocidade_x);
@@ -125,10 +143,7 @@ void setup() {
 
   delay(12000); //  Espera o giroscópio acelerar para iniciar o controle
 
-  //Condicoes Iniciais
-    x1 = 0;
-    x2 = 0;
-    x3 = 0;
+
     
   tempo_ultimo_controle = millis();
 }
@@ -140,8 +155,8 @@ void loop() {
   
   if (dt >= Ts) { // Loop de controle
     
-    sem_observador();
-    //observador();
+    //sem_observador();
+    observador();
 
     
     tempo_ultimo_controle = millis();
@@ -152,15 +167,27 @@ void loop() {
       Serial.print('\t');
     }
     if (plotar_x1) {
-      Serial.print(x1);
+      Serial.print(x1d);
       Serial.print('\t');
     }
     if (plotar_x2) {
-      Serial.print(x2);
+      Serial.print(x2d);
       Serial.print('\t');
     }
     if (plotar_x3) {
-      Serial.print(x3);
+      Serial.print(x3d);
+      Serial.print('\t');
+    }
+        if (plotar_x1e) {
+      Serial.print(xe1);
+      Serial.print('\t');
+    }
+    if (plotar_x2e) {
+      Serial.print(xe2);
+      Serial.print('\t');
+    }
+    if (plotar_x3e) {
+      Serial.print(xe3);
       Serial.print('\t');
     }
 //    if (plotar_atuacao_min_max) {
@@ -175,7 +202,7 @@ void loop() {
 
 void observador(){
 
-   u = -K1*x1 -K2*x2 -K3*x3;
+    u = -K1*x1 -K2*x2 -K3*x3;
 
     theta += (u*dt)/1000.0; //  Converter dt para segundos
     // Atua
@@ -188,47 +215,35 @@ void observador(){
       theta = kGrausParaRadianos*(servo_minimo-offset_servo);
     }
     
-   atuador.write(atuacao);
-   
+    atuador.write(atuacao);
+    
    Rotation rot = imu.GetRotation();
    Velocity vel = imu.GetVelocity();
+   
+    x1d = EIXO_X ? rot.x : rot.y;
+    x1d *= (inverter_imu ? -1 : 1);
+    x1d *= kGrausParaRadianos;
     
-    xd1 = EIXO_X ? rot.x : rot.y;
-    xd1 *= (inverter_imu ? -1 : 1);
-    xd1 *= kGrausParaRadianos;
-      
-    xd2 = theta;
+    x2d = theta;
   
-    xd3 = EIXO_X ? vel.x : vel.y;
-    xd3 *= (inverter_imu ? -1 : 1);
-    xd3 *= kGrausParaRadianos;
+    x3d = EIXO_X ? vel.x : vel.y;
+    x3d *= (inverter_imu ? -1 : 1);
+    x3d *= kGrausParaRadianos;
   
-    y1= xd1;
-    y2 = xd2;
-    
-    //L por lqr e r = 0.005
-//    xe1 = Ts1*(-51.9846*x1-51.9846*x2+x3)+Ts1*51.9846*y+x1;
-//    xe2 = Ts1*(18.9882*x1+15.9679*x2+1.8769*x3)-Ts1*14.1421*y+x2;
-//    xe3 = Ts1*(-832.7918*x1-675.4274*x2-163.8685*x3)+Ts1*516.0275*y+x3;
-    
-    //L por lqr v1  =0.0001 e v2=0.005;
-//    xe1 = Ts*(-21.5227*x1-21.5227*x2+x3)+Ts*21.5227*y+x1;
-//    xe2 = Ts*(5.2933*x1+2.2730*x2+1.8769*x3)-Ts*0.4472*y+x2;
-//    xe3 = Ts*(-538.6534*x1-381.2890*x2-163.8685*x3)+Ts*221.8891*y+x3;
+    y1 = x1d;
+    y2 = x2d;
 
-    //L por lqr v1  =0.0001 e v2=0.005; C = [1 0 0; 0 1 0]
-//    xe1 = Ts*(-37.8752*x1-0*x2+x3)+Ts*37.8752*y1+x1;
-//    xe2 = Ts*(4.8461*x1-29.7970*x2+1.8769*x3)+Ts*31.6228*y2+x2;
-//    xe3 = Ts*(-534.0301*x1-159.3999*x2-163.8685*x3)+Ts*217.2658*y1+x3;
+        //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]
+    xe1 = (Ts1*(-1.0421*x1-0.0062*x2+1*x3))/1000+(Ts1*1.0421*y1)/1000+x1;
+    xe2 = (Ts1*(2.6341*x1-0.4254*x2+0.6174*x3))/1000+(Ts1*0.9902*y2)/1000+x2;
+    xe3 = (Ts1*(-105.2803*x1-44.5130*x2-48.6636*x3))/1000+(Ts1*3.9974*y1)/1000+x3d;
 
-        //L por polo -10; C = [1 0 0; 0 1 0]
-    xe1 = Ts1*(-20.0500*x1-0*x2+x3)+Ts1*20.0500*y1+x1;
-    xe2 = Ts1*(4.8461*x1-8.2043*x2+1.8769*x3)+Ts1*10.03*y2+x2;
-    xe3 = Ts1*(-523.5958*x1-159.3999*x2-163.8685*x3)+Ts1*206.8316*y1+x3;
-    
+
     x1 = xe1;
     x2 = xe2;
     x3 = xe3;
+
+    
 }
 
 void sem_observador(){
@@ -245,7 +260,7 @@ void sem_observador(){
     x3 = EIXO_X ? vel.x : vel.y;
     x3 *= (inverter_imu ? -1 : 1);
     x3 *= kGrausParaRadianos;
-
+//
     u = -K1*x1 -K2*x2 -K3*x3;
 
     theta += (u*dt)/1000.0; //  Converter dt para segundos
