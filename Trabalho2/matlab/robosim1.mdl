@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.21"
+    ComputedModelVersion    "1.22"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -68,9 +68,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Regner"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Wed Nov 14 18:47:24 2018"
-  RTWModifiedTimeStamp	  464121975
-  ModelVersionFormat	  "1.%<AutoIncrement:21>"
+  LastModifiedDate	  "Mon Nov 19 22:54:44 2018"
+  RTWModifiedTimeStamp	  464568411
+  ModelVersionFormat	  "1.%<AutoIncrement:22>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -958,7 +958,7 @@ Model {
       ZOrder		      -7
       BlockMirror	      on
       ForegroundColor	      "orange"
-      InitialCondition	      "[0 pi/180*90 0 0]"
+      InitialCondition	      "[0 pi/180*10 0 0]"
     }
     Block {
       BlockType		      MATLABFcn

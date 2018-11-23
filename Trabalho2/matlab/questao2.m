@@ -71,5 +71,7 @@ F = [polo polo 0 0; 0 0 polo polo];
 A = [0 1;
      0 0]
  B = [0;1];
- r = 0.001
- lqr(A,B,eye(2),r)
+ r = 0.01;
+ K =lqr(A,B,eye(2),r)
+ F = [-K,zeros(1,2);zeros(1,2) -K]
+ 

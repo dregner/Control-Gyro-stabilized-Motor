@@ -61,39 +61,36 @@ const bool inverter_imu = false; //  Análogo ao inverter_direcao_servo. Ajustar
 // x2 -> Posição angular do giroscópio 'theta'
 // x3 -> Velocidade angular 'rho_ponto'
 
-//r = 0.1
-//const float K1 =  -7.2448;
-//const float K2 = -3.1623;
-//const float K3 = -3.2248;
-//r = 0.3 valores rpm = 7200
-//const float K1 =  -4.8461;
-//const float K2 = -1.8257;
-//const float K3 = -1.8769;
-//r = 0.4 valores rpm = 6500 FUNCIONANDO REDONDO (23hrs 14/11)
-//const float K1 =  -4.7122;
-//const float K2 = -1.5811;
-//const float K3 = -1.6387;
-//r = 0.7 valores rpm = 6500
-//const float K1 =  -4.0488;
-//const float K2 = -1.1952;
-//const float K3 = -1.2527;
+//K DISCRETO r = 0.7 Ts = 0.01
+//const float K1 = -3.0395;
+//const float K2 = -0.7455;
+//const float K3 = -0.7984;
 
-//K DISCRETO r = 0.7
-const float K1 = -2.6341;
-const float K2 = -0.5648;
-const float K3 = -0.6174;
+//K DISCRETO r = 0.3 Ts = 0.01
+//const float K1 = -3.2771;
+//const float K2 = -0.9223;
+//const float K3 = -0.9714;
+
+//K DISCRETO r = 0.7 Ts = 0.005
+const float K1 = -3.4727;
+const float K2 = -0.9386;
+const float K3 = -0.9930;
+
+//K DISCRETO r = 0.4 Ts = 0.005
+//const float K1 = -3.8102;
+//const float K2 = -1.1549;
+//const float K3 = -1.2074;
 
 
-const int Ts =  5;  // Período de amostragem, em ms.
-const int Ts1 = 5;    // Menor valor aconselhado 5ms
+const int Ts = 5;  // Período de amostragem, em ms.
 
 // Opções de visualização
 const bool plotar_referencia = false;
 const bool plotar_x1 = true;
-const bool plotar_x2 = true;
+const bool plotar_x2 = false;
 const bool plotar_x3 = true;
 const bool plotar_x1e = true;
-const bool plotar_x2e = true;
+const bool plotar_x2e = false;
 const bool plotar_x3e = true;
 const bool plotar_atuacao_min_max = false;
 
@@ -105,7 +102,7 @@ Servo atuador;
 Servo giroscopio;
 unsigned long tempo_ultimo_controle;
 float x1, x2, x3;
-double x1d,x2d,x3d, xe1, xe2, xe3, y1, y2;
+double x1d,x2d,x3d, xe1, xe2, xe3, y1, y2, y3;
 float du, dt;
 float theta = 0;
 float u;
@@ -122,7 +119,7 @@ void setup() {
     while(true);
   }
   //Condicoes Iniciais
-    x1 = 0.29;
+    x1 = 0.28;
     x2 = theta;
     x3 = 0;
     
@@ -155,13 +152,43 @@ void loop() {
   
   if (dt >= Ts) { // Loop de controle
     
-    //sem_observador();
+//    sem_observador();
     observador();
 
     
     tempo_ultimo_controle = millis();
     
-    // Plots
+    Serial.println();
+  }
+}
+void plot_re(){
+  // Plots
+    if (plotar_referencia) {
+      Serial.print(0);
+      Serial.print('\t');
+    }
+    if (plotar_x1) {
+      Serial.print(x1);
+      Serial.print('\t');
+    }
+    if (plotar_x2) {
+      Serial.print(x2);
+      Serial.print('\t');
+    }
+    if (plotar_x3) {
+      Serial.print(x3);
+      Serial.print('\t');
+    }
+    if (plotar_atuacao_min_max) {
+      Serial.print(kGrausParaRadianos*servo_maximo);
+      Serial.print('\t');
+      Serial.print(kGrausParaRadianos*servo_minimo);
+      Serial.print('\t');
+    }
+
+}
+void plot_obs(){
+      // Plots
     if (plotar_referencia) {
       Serial.print(0);
       Serial.print('\t');
@@ -190,16 +217,13 @@ void loop() {
       Serial.print(xe3);
       Serial.print('\t');
     }
-//    if (plotar_atuacao_min_max) {
-//      Serial.print(kGrausParaRadianos*servo_maximo);
-//      Serial.print('\t');
-//      Serial.print(kGrausParaRadianos*servo_minimo);
-//      Serial.print('\t');
-//    }
-    Serial.println();
-  }
+    if (plotar_atuacao_min_max) {
+      Serial.print(kGrausParaRadianos*servo_maximo);
+      Serial.print('\t');
+      Serial.print(kGrausParaRadianos*servo_minimo);
+      Serial.print('\t');
+    }
 }
-
 void observador(){
 
     u = -K1*x1 -K2*x2 -K3*x3;
@@ -232,17 +256,35 @@ void observador(){
   
     y1 = x1d;
     y2 = x2d;
+    y3 = x3d;
 
-        //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]
-    xe1 = (Ts1*(-1.0421*x1-0.0062*x2+1*x3))/1000+(Ts1*1.0421*y1)/1000+x1;
-    xe2 = (Ts1*(2.6341*x1-0.4254*x2+0.6174*x3))/1000+(Ts1*0.9902*y2)/1000+x2;
-    xe3 = (Ts1*(-105.2803*x1-44.5130*x2-48.6636*x3))/1000+(Ts1*3.9974*y1)/1000+x3d;
 
+
+      //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.01
+//    xe1 = (-0.0562*x1-0.0062*x2+0.0100*x3)+1.0421*y1;
+//    xe2 = (0.0439*x1+0.0192*x2+0.0103*x3)+0.9902*y2;
+//    xe3 = (-5.6938*x1-0.7455*x2+0.1997*x3)+3.9974*y1;
+
+    //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1 Kd = 0.7 ts 5
+    xe1 = (0.0738*x1-0.0009*x2+0.0040*x3)+0.9241*y1;
+    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
+    xe3 = (-2.5714*x1-0.3700*x2+0.6098*x3d)+1.7342*y1;
+
+//   //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.001
+//    xe1 = (-0.0089*x1-0.0009*x2+0.0040*x3)+1.0068*y1;
+//    xe2 = (0.0174*x1+0.0057*x2+0.0050*x3)+0.999*y2;
+//    xe3 = (-2.6669*x1-0.3700*x2+0.6098*x3)+1.8296*y1;
+
+
+//   //DISCRETO L por LQR 0.01; C = eye(3) (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1
+//    xe1 = (0.0807*x1-0.0009*x2-0.0040*x3)+0.9172*y1+0.008*y3;
+//    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
+//    xe3 = (-1.3279*x1-0.3700*x2 -0.3110*x3)+0.4906*y1+0.9208*y3;
 
     x1 = xe1;
     x2 = xe2;
     x3 = xe3;
-
+    plot_obs();
     
 }
 
@@ -275,6 +317,7 @@ void sem_observador(){
     }
     
     atuador.write(atuacao);
+    plot_re();
 
 
 }   

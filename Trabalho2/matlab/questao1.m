@@ -33,7 +33,8 @@ A = double(subs(jacobian(f),[x1 x2],[0 0]));
 B = double(subs(u, [x1 x2],[0 0]));
 C = [1 0 0;
     0 1 0 ];
-D = zeros(2,1);
+C = eye(3);
+Dsim = zeros(3,1);
 x0 = [pi/180*45 0 0];
 P1 = [-12.01 -12.02 -12];
 K = place(A,B,P1);
@@ -43,7 +44,7 @@ Obs = obsv(A,C)
 rank(Obs)
 
 %% DIstrecizacao Planta
-Ts = 1/(20*3);
+Ts = 0.01;
 [Ad, Bd] = c2d(A,B,Ts);
 
 %% LQR for R.L.
@@ -58,17 +59,25 @@ eig(Ad-Bd*Kd)
 x0_obs = [pi/180*45 0 0];
 
 Q = eye(3);
-ro=0.01;
-R=ro*eye(2);
+ro=0.1;
+R=ro*eye(3);
 Ld = dlqr(Ad',C',Q,R)'
-eig(Ad-Ld*C);
+eig(Ad-Ld*C)
 V1 = 10e-7*eye(3);
-V2 = 50e-7*eye(2);
+V2 = 50e-7*eye(3);
 rkf = 0.001;
 Ldkf = dlqr(Ad',C', V1, rkf*V2)';
 %Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
 
 %% PLOTS
+figure
+hold on
+plot(tout,x_din(:,2),'r')
+plot(tout,x_din(:,3),'b')
+plot(tout,x_din(:,4),'g')
+plot(tout,x_din(:,5),'r--')
+plot(tout,x_din(:,6),'b--')
+plot(tout,x_din(:,7),'g--')
 %close all
 % figure(1)
 % plot(tout,x(:,2),tout,x(:,3),tout,x(:,4)) % plot estados
