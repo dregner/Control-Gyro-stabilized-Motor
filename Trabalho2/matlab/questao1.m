@@ -60,7 +60,7 @@ x0_obs = [pi/180*45 0 0];
 
 Q = eye(3);
 ro=0.1;
-R=ro*eye(3);
+R=ro*eye(3)
 Ld = dlqr(Ad',C',Q,R)'
 eig(Ad-Ld*C)
 V1 = 10e-7*eye(3);
@@ -70,14 +70,14 @@ Ldkf = dlqr(Ad',C', V1, rkf*V2)';
 %Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
 
 %% PLOTS
-figure
-hold on
-plot(tout,x_din(:,2),'r')
-plot(tout,x_din(:,3),'b')
-plot(tout,x_din(:,4),'g')
-plot(tout,x_din(:,5),'r--')
-plot(tout,x_din(:,6),'b--')
-plot(tout,x_din(:,7),'g--')
+% figure
+% hold on
+% plot(tout,x_din(:,2),'r')
+% plot(tout,x_din(:,3),'b')
+% plot(tout,x_din(:,4),'g')
+% plot(tout,x_din(:,5),'r--')
+% plot(tout,x_din(:,6),'b--')
+% plot(tout,x_din(:,7),'g--')
 %close all
 % figure(1)
 % plot(tout,x(:,2),tout,x(:,3),tout,x(:,4)) % plot estados

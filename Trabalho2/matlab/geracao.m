@@ -1,13 +1,25 @@
 function [out] = geracao(x);
 t = x;
-A = 0.5;
-B = 0;
-C = 0;
-D = 0.3;
-E = 0.3;
+A = 0;
+B = 1;
+C = 1;
+D = 0;
+E = 0;
 alfa = 2;
 beta = 2;
 
+if( t == 20)
+    B = -1
+    C = 1
+end
+if(t == 30)
+    B = -1
+    C = -1
+end
+if(t == 40)
+    B = 1
+    C= -1
+end
 % yr1 = A*sin(t)+C;
 % yr2 = A*cos(t)+B;
 % 
