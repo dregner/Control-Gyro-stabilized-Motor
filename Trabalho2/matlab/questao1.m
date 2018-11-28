@@ -47,27 +47,39 @@ rank(Obs)
 Ts = 0.01;
 [Ad, Bd] = c2d(A,B,Ts);
 
+
 %% LQR for R.L.
 Q = eye(3);
 rf=0.7;
 R=rf*eye(1);
 Kd = dlqr(Ad,Bd,Q,R)
 eig(Ad-Bd*Kd)
-%Kd = place(Ad, Bd, [-0.7239 + 1.0219i,-0.7239 - 1.0219i,1])
 
-%% Ganhos LQG para L
-x0_obs = [pi/180*45 0 0];
 
-Q = eye(3);
-ro=0.1;
-R=ro*eye(3)
-Ld = dlqr(Ad',C',Q,R)'
-eig(Ad-Ld*C)
-V1 = 10e-7*eye(3);
-V2 = 50e-7*eye(3);
-rkf = 0.001;
-Ldkf = dlqr(Ad',C', V1, rkf*V2)';
-%Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
+
+
+
+
+
+
+
+
+
+
+ 
+ %% Ganhos LQG para L
+% x0_obs = [pi/180*45 0 0];
+% 
+% Q = eye(3);
+% ro=0.1;
+% R=ro*eye(3)
+% Ld = dlqr(Ad',C',Q,R)'
+% eig(Ad-Ld*C)
+% V1 = 10e-7*eye(3);
+% V2 = 50e-7*eye(3);
+% rkf = 0.001;
+% Ldkf = dlqr(Ad',C', V1, rkf*V2)';
+% %Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
 
 %% PLOTS
 % figure
