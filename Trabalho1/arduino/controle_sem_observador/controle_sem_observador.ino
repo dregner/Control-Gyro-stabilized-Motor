@@ -87,10 +87,10 @@ const int Ts = 5;  // Período de amostragem, em ms.
 // Opções de visualização
 const bool plotar_referencia = false;
 const bool plotar_x1 = true;
-const bool plotar_x2 = false;
+const bool plotar_x2 = true;
 const bool plotar_x3 = true;
 const bool plotar_x1e = true;
-const bool plotar_x2e = false;
+const bool plotar_x2e = true;
 const bool plotar_x3e = true;
 const bool plotar_atuacao_min_max = false;
 
@@ -152,8 +152,8 @@ void loop() {
   
   if (dt >= Ts) { // Loop de controle
     
-//    sem_observador();
-    observador();
+    sem_observador();
+//    observador();
 
     
     tempo_ultimo_controle = millis();
@@ -266,9 +266,9 @@ void observador(){
 //    xe3 = (-5.6938*x1-0.7455*x2+0.1997*x3)+3.9974*y1;
 
     //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1 Kd = 0.7 ts 5
-    xe1 = (0.0738*x1-0.0009*x2+0.0040*x3)+0.9241*y1;
-    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
-    xe3 = (-2.5714*x1-0.3700*x2+0.6098*x3d)+1.7342*y1;
+//    xe1 = (0.0738*x1-0.0009*x2+0.0040*x3)+0.9241*y1;
+//    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
+//    xe3 = (-2.5714*x1-0.3700*x2+0.6098*x3d)+1.7342*y1;
 
 //   //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.001
 //    xe1 = (-0.0089*x1-0.0009*x2+0.0040*x3)+1.0068*y1;
@@ -277,9 +277,11 @@ void observador(){
 
 
 //   //DISCRETO L por LQR 0.01; C = eye(3) (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1
-//    xe1 = (0.0807*x1-0.0009*x2-0.0040*x3)+0.9172*y1+0.008*y3;
-//    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
-//    xe3 = (-1.3279*x1-0.3700*x2 -0.3110*x3)+0.4906*y1+0.9208*y3;
+    xe1 = (0.0807*x1-0.0009*x2-0.0040*x3)+0.9172*y1+0.008*y3;
+    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
+    xe3 = (-1.3279*x1-0.3700*x2 -0.3110*x3)+0.4906*y1+0.9208*y3;
+
+
 
     x1 = xe1;
     x2 = xe2;

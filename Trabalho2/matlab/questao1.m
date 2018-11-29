@@ -44,7 +44,7 @@ Obs = obsv(A,C)
 rank(Obs)
 
 %% DIstrecizacao Planta
-Ts = 0.01;
+Ts = 0.005;
 [Ad, Bd] = c2d(A,B,Ts);
 
 %% LQR for R.L.

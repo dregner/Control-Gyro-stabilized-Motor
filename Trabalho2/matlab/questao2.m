@@ -12,25 +12,7 @@ M1 = inv(M);
 F = M1*H
 
 F = [dth1; dth2; F]
-G = [zeros(2,2); M1]
-%%
-h11 = [ - sin(th1 + th2) - sin(th1), -sin(th1 + th2), 0, 0];
-%h12 = [-cos(th1+th2)+cos(th1)-dth1*cos(th1+th2), -cos(th1+th2)-dth1*cos(th1+th2),-sin(th1+th2),-1];
-h12 = [-dth2*cos(th1+th2)-dth1*(cos(th1+th2)+cos(th1)),-dth2*cos(th1+th2)-dth1*cos(th1+th2),-sin(th1+th2)-sin(th1),-sin(th1+th2)];
-Lfh1 = h11*F;
-Lgh1 = h11*G;
-Lf2h1 = h12*F;
-LgLfh1 = h12*G;
-
-h21 = [cos(th1+th2)+cos(th1),cos(th1+th2),0,0];
-h22 = [-dth2*sin(th1+th2),-dth1*(sin(th1+th2)+sin(th1)),cos(th1+th2)+cos(th1),cos(th1+th2)]
-Lfh2 = h21*F;
-Lgh2 = h21*G;
-Lf2h2 = h22*F
-LgLfh2 = h22*G
-
-Aa = [LgLfh1;LgLfh2]
-aa = [Lfh1, Lf2h1;Lfh2,Lf2h2]
+G = [zeros(2,2); -M1]
 
 %%
 
