@@ -7,7 +7,7 @@ Model {
     NumRootInports	    0
     NumRootOutports	    0
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.26"
+    ComputedModelVersion    "1.27"
     NumModelReferences	    0
     NumTestPointedSignals   0
     NumProvidedFunctions    0
@@ -32,7 +32,7 @@ Model {
       $ObjectID		      2
       $ClassName	      "Simulink.WindowInfo"
       IsActive		      [1]
-      Location		      [-8.0, -8.0, 1936.0, 1056.0]
+      Location		      [-7.0, 0.0, 974.0, 1047.0]
       Object {
 	$PropName		"ModelBrowserInfo"
 	$ObjectID		3
@@ -56,9 +56,9 @@ Model {
 	IsActive		[1]
 	ViewObjType		"SimulinkTopLevel"
 	LoadSaveID		"0"
-	Extents			[1886.0, 881.0]
+	Extents			[924.0, 872.0]
 	ZoomFactor		[1.75]
-	Offset			[-97.478010149161946, 25.0]
+	Offset			[-140.90658157773342, -36.484572852803751]
       }
     }
   }
@@ -68,9 +68,9 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Regner"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Mon Nov 26 09:59:59 2018"
-  RTWModifiedTimeStamp	  465127004
-  ModelVersionFormat	  "1.%<AutoIncrement:26>"
+  LastModifiedDate	  "Wed Nov 28 23:32:17 2018"
+  RTWModifiedTimeStamp	  465336243
+  ModelVersionFormat	  "1.%<AutoIncrement:27>"
   ConfigurationManager	  "none"
   SampleTimeColors	  off
   SampleTimeAnnotations	  off
@@ -950,7 +950,7 @@ Model {
   }
   System {
     Name		    "robosim1"
-    Location		    [-8, -8, 1928, 1048]
+    Location		    [-7, 0, 967, 1047]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -1725,11 +1725,11 @@ Stateflow {
       isEML		      1
       script		      "function out  = geracao(x)\nt = x;\nA = 0;\nC = 1;\nB = 1;\nD = 0;\nE = 0;\nalfa = 2;\nbeta = 2;\n"
       "\nif( 19<t)&&(t< 29)\n    B = -1;\n    C = 1;\nend\nif(29<t)&&(t< 39)\n    B = -1;\n    C = -1;\nend\nif(39<t)&&"
-      "(t< 45)\n    B = 2;\n    C= -2;\nend\nif(49<t)&&(t<60)\n    A = 1;\n    B = .5;\n    C = .5;\nend\n% yr1 = A*sin"
-      "(t)+C;\n% yr2 = A*cos(t)+B;\n% \n% dyr1 = A*cos(t);\n% dyr2 = -A*sin(t);\n% \n% ddyr1 = -A*sin(t);\n% ddyr2 = -A"
-      "*cos(t);\n\nyr1 = A*sin(t)+D*(1-exp(-alfa*t))+C;\nyr2 = A*cos(t)+E*(1-exp(-t*beta))+B;\n\ndyr1 = A*cos(t)+D*alfa"
-      "*exp(-alfa*t);\ndyr2 = -A*sin(t)+E*beta*exp(-beta*t);\n\nddyr1 = -A*sin(t)-D*alfa^2*exp(-alfa*t);\nddyr2 = -A*co"
-      "s(t)-E*beta^2*exp(-beta*t);\n\nout = [yr1; dyr1; yr2; dyr2; ddyr1; ddyr2];"
+      "(t< 45)\n    B = 1;\n    C= -1;\nend\nif(49<t)&&(t<60)\n    A = 1;\n    B = 0;\n    C = 0;\nend\n% yr1 = A*sin(t"
+      ")+C;\n% yr2 = A*cos(t)+B;\n% \n% dyr1 = A*cos(t);\n% dyr2 = -A*sin(t);\n% \n% ddyr1 = -A*sin(t);\n% ddyr2 = -A*c"
+      "os(t);\n\nyr1 = A*sin(t)+D*(1-exp(-alfa*t))+C;\nyr2 = A*cos(t)+E*(1-exp(-t*beta))+B;\n\ndyr1 = A*cos(t)+D*alfa*e"
+      "xp(-alfa*t);\ndyr2 = -A*sin(t)+E*beta*exp(-beta*t);\n\nddyr1 = -A*sin(t)-D*alfa^2*exp(-alfa*t);\nddyr2 = -A*cos("
+      "t)-E*beta^2*exp(-beta*t);\n\nout = [yr1; dyr1; yr2; dyr2; ddyr1; ddyr2];"
       editorLayout	      "100 M4x1[10 5 700 500]"
     }
   }

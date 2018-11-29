@@ -36,8 +36,7 @@ C = [1 0 0;
 C = eye(3);
 Dsim = zeros(3,1);
 x0 = [pi/180*45 0 0];
-P1 = [-12.01 -12.02 -12];
-K = place(A,B,P1);
+x0_obs = x0;
 Con = ctrb(A,B)
 rank(Con)
 Obs = obsv(A,C)
@@ -55,7 +54,12 @@ R=rf*eye(1);
 Kd = dlqr(Ad,Bd,Q,R)
 eig(Ad-Bd*Kd)
 
+%% Kalman Filter
 
+Q = 10e-7*eye(3);
+R = 50e-7*eye(3);
+
+v = wgn(3,3,10e-7)
 
 
 
