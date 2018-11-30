@@ -1,0 +1,27 @@
+# For information on keywords, see
+# httparduino.ccenHackingLibraryTutorial
+# 
+# Each line has the name of the keyword,
+# followed by a tab (not spaces), 
+# followed by the kind of keyword. 
+# 
+# classes should be KEYWORD1 and are colored orange 
+# functions should be KEYWORD2 and will be brown
+
+###
+Mpu6050	KEYWORD1
+
+###
+Begin	KEYWORD2
+Update	KEYWORD2
+SetXPosOffset	KEYWORD2
+SetYPosOffset	KEYWORD2
+SetXSpeedOffset	KEYWORD2
+SetYSpeedOffset	KEYWORD2
+SetZSpeedOffset	KEYWORD2
+GetRawReadings	KEYWORD2
+GetRotation	KEYWORD2
+GetVelocity	KEYWORD2
+RawReadings	KEYWORD2
+Rotation	KEYWORD2
+Velocity	KEYWORD2
