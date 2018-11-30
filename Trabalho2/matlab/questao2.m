@@ -53,3 +53,38 @@ A = [0 1;
  K =lqr(A,B,eye(2),r)
  Kd = [-K,zeros(1,2);zeros(1,2) -K]
  
+ %% PLOTS
+%  
+%  figure(1)
+%  hold on
+%  plot(torque(:,1), torque(:,2),'r');
+%  plot(torque(:,1), torque(:,3),'b');
+%  legend('T1','T2');
+%  title('Torque');
+%  
+%   figure(2)
+%  hold on
+%  plot(x(:,1), x(:,2),'r');
+%  plot(x(:,1), x(:,3),'b');
+%  plot(x(:,1), x(:,4),'y');
+%  plot(x(:,1), x(:,5),'g');
+%  legend('x1','x2','x3','x4');
+%  title('Estados');
+%  
+%  figure(3)
+%  hold on
+%  plot(erro(:,1), erro(:,2),'r');
+%  plot(erro(:,1), erro(:,3),'b');
+%  plot(erro(:,1), erro(:,4),'y');
+%  plot(erro(:,1), erro(:,5),'g');
+%  legend('e1','e2','e3','e4');
+%  
+%  figure(4)
+%  hold on
+%  plot(y(:,1), y(:,2),'r');
+%  plot(x(:,1), y(:,3),'b');
+%  plot(x(:,1), y(:,4),'y');
+%  plot(y(:,1), y(:,5),'g');
+%  legend('y1','dy1','y2','dy2','yr1',);
+%  title('Estados');
+ 
