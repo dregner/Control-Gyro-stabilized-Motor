@@ -4,7 +4,7 @@
 Mv = 0.152; % Massa do veículo sem giro [kg]
 Mg = 0.15; % Massa do giro [kg]
 Rg = 0.095/2; % Raio do giro [m]
-Ag = 0.006; % Espessura giro [m]
+Ag = 0.006; % Es  pessura giro [m]
 Av = 0.075; % Altura veículo [m]
 Lv = 0.19; % Largura veículo [m]
 Dg = 0.06; % Distância entre centro de massa do giro e eixo de rotação [m]
@@ -24,6 +24,7 @@ u1 = 0;
 u2 = 1;
 u3 = (-2*cos(x2)*sin(x2)*x3*(IG33-IG11)-Omega*cos(x2)*IG33)/(IB11+IG11*(cos(x2)^2)+Mv*(Dv^2)+Mg*(Dg^2)+IG33*(sin(x2)^2));
 u=[u1;u2;u3];
+
 %% modelo
 
 Am = double(subs(jacobian(f),[x1 x2],[0 0]));
@@ -42,8 +43,8 @@ Lkf = dlqr(Amd',Cm',1e-4*eye(3),1*eye(2))'
 eig(Amd-Lkf*Cm)
 %% Filtro de Kalman
 % Ruidos
-w = 10e-6*eye(3); % estados
-v = 30e-6*eye(2); % saida
+w = 10e-8*eye(3); % estados
+v = 30e-8*eye(2); % saida
 w(1,1) = 10e-4*w(1,1);
 w(2,2) = 10e-4*w(2,2);
     %Pam = 10e-6*eye(3); % Matriz covariancia
