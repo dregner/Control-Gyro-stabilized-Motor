@@ -95,7 +95,7 @@ Servo atuador;
 Servo giroscopio;
 unsigned long tempo_ultimo_controle;
 float x1, x2, x3;
-double x1p,x2p,x3p, x1d,x2d,x3d, xe1, xe2, xe3, y1, y2, y3;
+double xe1, xe2, xe3, y1, y2, y3;
 float du, dt;
 float theta = 0;
 float u;
@@ -145,28 +145,41 @@ void loop() {
   
   if (dt >= Ts) { // Loop de controle
     
-    sem_observador();
-   
+      observador();
+        
     tempo_ultimo_controle = millis();
     
     Serial.println();
   }
 }
-void plot_re(){
-  // Plots
+
+void plot_obs(){
+      // Plots
     if (plotar_referencia) {
       Serial.print(0);
       Serial.print('\t');
     }
     if (plotar_x1) {
-      Serial.print(x1);
+      Serial.print(y1);
       Serial.print('\t');
     }
     if (plotar_x2) {
-      Serial.print(x2);
+      Serial.print(y2);
       Serial.print('\t');
     }
     if (plotar_x3) {
+      Serial.print(y3);
+      Serial.print('\t');
+    }
+        if (plotar_x1e) {
+      Serial.print(x1);
+      Serial.print('\t');
+    }
+    if (plotar_x2e) {
+      Serial.print(x2);
+      Serial.print('\t');
+    }
+    if (plotar_x3e) {
       Serial.print(x3);
       Serial.print('\t');
     }
@@ -176,24 +189,11 @@ void plot_re(){
       Serial.print(kGrausParaRadianos*servo_minimo);
       Serial.print('\t');
     }
-
 }
 
-void sem_observador(){
 
-   Rotation rot = imu.GetRotation();
-   Velocity vel = imu.GetVelocity();
-   
-    x1 = EIXO_X ? rot.x : rot.y;
-    x1 *= (inverter_imu ? -1 : 1);
-    x1 *= kGrausParaRadianos;
-    
-    x2 = theta;
-  
-    x3 = EIXO_X ? vel.x : vel.y;
-    x3 *= (inverter_imu ? -1 : 1);
-    x3 *= kGrausParaRadianos;
-//
+void observador(){
+
     u = -K1*x1 -K2*x2 -K3*x3;
 
     theta += (u*dt)/1000.0; //  Converter dt para segundos
@@ -208,9 +208,51 @@ void sem_observador(){
     }
     
     atuador.write(atuacao);
-    plot_re();
-
-
-}   
-
     
+   Rotation rot = imu.GetRotation();
+   Velocity vel = imu.GetVelocity();
+   
+    y1 = EIXO_X ? rot.x : rot.y;
+    y1 *= (inverter_imu ? -1 : 1);
+    y1 *= kGrausParaRadianos;
+    
+    y2 = theta;
+  
+    y3 = EIXO_X ? vel.x : vel.y;
+    y3 *= (inverter_imu ? -1 : 1);
+    y3 *= kGrausParaRadianos;
+  
+    
+      //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.01
+//    xe1 = (-0.0562*x1-0.0062*x2+0.0100*x3)+1.0421*y1;
+//    xe2 = (0.0439*x1+0.0192*x2+0.0103*x3)+0.9902*y2;
+//    xe3 = (-5.6938*x1-0.7455*x2+0.1997*x3)+3.9974*y1;
+
+//    //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1 Kd = 0.7 ts 5
+//    xe1 = (0.0738*x1-0.0009*x2+0.0040*x3)+0.9241*y1;
+//    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
+//    xe3 = (-2.5714*x1-0.3700*x2+0.6098*x3d)+1.7342*y1;
+
+     //DISCRETO L por LQR q=1e-4 r = 1; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1 Kd = 0.7 ts 5
+    xe1 = (0.07865*x1-0.0029*x2+0.0069*x3)+0.2068*y1;
+    xe2 = (0.0304*x1+0.9975*x2+0.0080*x3)+0.01*y2;
+    xe3 = (-3.4652*x1-0.5886*x2+0.3749*x3)+2.1304*y1;
+
+
+//   //DISCRETO L por LQR 0.01; C = [1 0 0; 0 1 0]  (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.001
+//    xe1 = (-0.0089*x1-0.0009*x2+0.0040*x3)+1.0068*y1;
+//    xe2 = (0.0174*x1+0.0057*x2+0.0050*x3)+0.999*y2;
+//    xe3 = (-2.6669*x1-0.3700*x2+0.6098*x3)+1.8296*y1;
+
+
+//   //DISCRETO L por LQR 0.01; C = eye(3) (Ad-Bd*Kd-Ld*C) + Ld*y Ld = lqr 0.1
+//    xe1 = (0.0807*x1-0.0009*x2-0.0040*x3)+0.9172*y1+0.008*y3;
+//    xe2 = (0.0174*x1+0.0886*x2+0.0050*x3)+0.9161*y2;
+//    xe3 = (-1.3279*x1-0.3700*x2 -0.3110*x3)+0.4906*y1+0.9208*y3;
+
+    x1 = xe1;
+    x2 = xe2;
+    x3 = xe3;
+    plot_obs();
+    
+}
