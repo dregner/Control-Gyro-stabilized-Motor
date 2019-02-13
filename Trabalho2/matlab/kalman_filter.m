@@ -30,7 +30,7 @@ Am = double(subs(jacobian(f),[x1 x2],[0 0]));
 Bm = double(subs(u, [x1 x2],[0 0]));
 Cm = [1 0 0; 0 1 0];% 0 0 0];
 %Cm = [1 0 0;0 0 0];
-Dmsim = zeros(3,1);
+Dmsim = zeros(2,2);
 Tsm = 0.01;
 x0m = [0 0 0];
     
@@ -42,8 +42,8 @@ Lkf = dlqr(Amd',Cm',1e-4*eye(3),1*eye(2))'
 eig(Amd-Lkf*Cm)
 %% Filtro de Kalman
 % Ruidos
-w = 10e-8*eye(3); % estados
-v = 30e-8*eye(2); % saida
+w = 10e-6*eye(3); % estados
+v = 30e-6*eye(2); % saida
 w(1,1) = 10e-4*w(1,1);
 w(2,2) = 10e-4*w(2,2);
     %Pam = 10e-6*eye(3); % Matriz covariancia
