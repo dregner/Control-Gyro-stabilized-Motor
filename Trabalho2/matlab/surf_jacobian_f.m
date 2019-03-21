@@ -32,7 +32,7 @@ end
 %% Surface Graphic f31
 figure (1)
 surf(x1,y1,Z1)
-colormap(hot(20))
+%colormap(hot(20))
 title('jacobian(f) - f31');
 xlabel('x1');
 ylabel('x2');
@@ -41,7 +41,7 @@ zlabel('f(x1,x2)');
 %% Surface Graphic f32
 figure (2)
 surf(x2,y2,Z2)
-colormap(hot(20))
+%colormap(hot(20))
 title('jacobian(f) - f32');
 xlabel('x1');
 ylabel('x2');

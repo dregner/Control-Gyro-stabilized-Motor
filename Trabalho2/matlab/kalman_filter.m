@@ -1,3 +1,5 @@
+clear all
+clc
 %% MODELO SISTEMAA MOTO MULTIVAR
 
 % Parâmetros do modelo
@@ -33,9 +35,13 @@ Cm = [1 0 0; 0 1 0];% 0 0 0];
 %Cm = [1 0 0;0 0 0];
 Dmsim = zeros(2,2);
 Tsm = 0.005;
+Ts = Tsm;
 x0m = [0 0 0];
     
 [Amd, Bmd] = c2d(Am, Bm, Tsm);
+A = Amd;
+B = Bmd;
+C = Cm;
 
 Kd = dlqr(Amd, Bmd,eye(3),0.7);
 eig(Amd - Kd*Bmd)
@@ -53,8 +59,17 @@ w(2,2) = 10e-4*w(2,2);
 %% Variaveis Manipulaveis
 
 %Ruido w e v
-w = 1e-10*eye(3); w(1,1) = 1e-0*w(1,1); w(2,2) = 1e-0*w(2,2); w(3,3) = 1e-0*w(2,2);
+w = 1e-7*eye(3); w(1,1) = 1e-0*w(1,1); w(2,2) = 1e-0*w(2,2); w(3,3) = 1e-0*w(2,2);
 v = 1e-8*eye(2); v(1,1) = 1e-0*v(1,1); v(2,2) = 1e-0*v(2,2);
 Pam = 1e-6*eye(3); % Matriz covariancia
-    %Pam = [2.939e-6 0 3.031e-5; 0 1.732e-8 0; 3.031e-5 0 0.0003126]
-    %Pam = [5.591e-6 0 5.765e-5; 0 1.732e-8 0; 5.765e-5 0 0.0005945];
+
+Q = 1e-10
+R = 1e-10
+
+% Ruidos para extended Kalman Filter
+w1 = R*eye(3); w1(1,1) = 1e-0*w1(1,1); w1(2,2) = 1e-0*w1(2,2); w1(3,3) = 1e-0*w1(2,2);
+v1= Q*eye(2); v1(1,1) = 1e-0*v1(1,1); v1(2,2) = 1e-0*v1(2,2);
+% Saturacoes observador EKF
+sat_x1o = 10000;
+sat_x2o = 10000;
+sat_x3o = 10000;
