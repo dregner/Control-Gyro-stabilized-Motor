@@ -59,12 +59,12 @@ w(2,2) = 10e-4*w(2,2);
 %% Variaveis Manipulaveis
 
 %Ruido w e v
-w = 1e-7*eye(3); w(1,1) = 1e-0*w(1,1); w(2,2) = 1e-0*w(2,2); w(3,3) = 1e-0*w(2,2);
-v = 1e-8*eye(2); v(1,1) = 1e-0*v(1,1); v(2,2) = 1e-0*v(2,2);
+w = 1e-6*eye(3); w(1,1) = 1e-0*w(1,1); w(2,2) = 1e-0*w(2,2); w(3,3) = 1e-0*w(2,2);
+v = 1e-6*eye(2); v(1,1) = 1e-0*v(1,1); v(2,2) = 1e-0*v(2,2);
 Pam = 1e-6*eye(3); % Matriz covariancia
 
-Q = 1e-10
-R = 1e-10
+Q = 1e-3
+R = 1e-3
 
 % Ruidos para extended Kalman Filter
 w1 = R*eye(3); w1(1,1) = 1e-0*w1(1,1); w1(2,2) = 1e-0*w1(2,2); w1(3,3) = 1e-0*w1(2,2);
