@@ -30,6 +30,7 @@ Matrix<float> S(2,2,'I');
 Matrix<float> P(3,3,'I');
 
 Matrix<float> xp(3,1,1);
+Matrix<float> xap(3,1,1);
 Matrix<float> Pp(3,3,1);
 Matrix<float> x(3,1,1);
 Matrix<float> K(3,2,1);
@@ -39,17 +40,17 @@ Matrix<float> K(3,2,1);
 // Altere os valores conforme a montagem do seu projeto
 
 // Pinos
-const int pino_servo = 9;
+const int pino_servo = 8;
 const int pino_giroscopio = 4;
 
 // Parâmetros servo
-const int offset_servo = 85; /* Valor, em graus, que deixa o
+const int offset_servo = 80; /* Valor, em graus, que deixa o
                                 giroscópio paralelo a moto.
                                 Utilizar o programa teste_servo
                                 para determinar o valor.
                              */
-const int servo_maximo = 127; 
-const int servo_minimo = 47; /*//  Limite superior da atuação do servo
+const int servo_maximo = 120; 
+const int servo_minimo = 40; /*//  Limite superior da atuação do servo
                                //  Limite inferior da atuação do servo
                               //  Novamente, utilize o arquivo teste_servo
                               //  para determinar o menor e maior valor para atuar*/
@@ -68,9 +69,9 @@ const bool EIXO_X = true; /* A IMU pode ser montada de duas formas,
                              false = eixo de rotação da moto corresponde
                                     ao eixo Y da IMU
                            */                    
-float offset_posicao_x = 0.65;
+float offset_posicao_x = 1;
 float offset_posicao_y = 0.0;
-float offset_velocidade_x = -10.58;
+float offset_velocidade_x = -9;
 float offset_velocidade_y = 0.0; //  Para determinar os valores utilize o programa calibracao_imu
 
 
@@ -223,16 +224,8 @@ void observador(){
     u = -K1*x1 -K2*x2 -K3*x3;
 
     theta += (u*dt)/1000.0; //  Converter dt para segundos
-    // Atua
-    atuacao = static_cast<int>((inverter_direcao_servo ? -1 : 1)*kRadianosParaGraus*theta + offset_servo);
-    if (atuacao > servo_maximo) {
-      atuacao = servo_maximo;
-      theta = kGrausParaRadianos*(servo_maximo-offset_servo); //  Não pode deixar theta ficar crescendo!
-    } else if (atuacao < servo_minimo) {
-      atuacao = servo_minimo;
-      theta = kGrausParaRadianos*(servo_minimo-offset_servo);
-    }
-    
+    theta = min(0.7, max(-0.7, theta));
+    atuacao = mapfloat(theta, -0.7, 0.7, 40, 120);
     atuador.write(atuacao);
     
    Rotation rot = imu.GetRotation();
@@ -253,24 +246,36 @@ void observador(){
     
 }
 void kalman_code(){
+  
   float x_a[3][1] = {{x1},{x2},{x3}};
   Matrix<float> xa(3,1,(float*)x_a);
-    float y_[2][1] = {{y1},{y2}};
+
+  float y_[2][1] = {{y1},{y2}};
   Matrix<float> y(2,1,(float*)y_);
-  xp = A*xa+B*u;
-  Matrix<float> At = Matrix<float>::transpose(A);
-  Pp = ((A*P)*At)+w;
 
   Matrix<float> Ct = Matrix<float>::transpose(C);
-  Matrix<float> S = (C*Pp)*Ct+v;
+  Matrix<float> S = (C*P)*Ct+v;
+  
   float S_inv[2][2] = {{1/S._entity[0][0],0},{0,1/S._entity[1][1]}};
   Matrix<float> Sinv(2,2,(float*)S_inv); //= Matrix<float>::inv(S);
-  K = (Pp*Ct)*Sinv;
-  x = xp+K*(y-C*xp);
-  Matrix<float> Kt = Matrix<float>::transpose(K);
-  P = Pp-((K*S)*Kt);
-  x1 = x._entity[0][0];
-  x2 = x._entity[1][0];
-  x3 = x._entity[2][0];
+  
+  K = (P*Ct)*Sinv;
+  xap = xa+K*(y-C*xa)
+  ;
+  Matrix<float> eye3(3,3,'I');
+  Pp = (eye3 - K*C)*P;
 
+  xp = A*xap+B*u;
+  Matrix<float> At = Matrix<float>::transpose(A);
+  P = ((A*Pp)*At)+w;
+  
+  x1 = xp._entity[0][0];
+  x2 = xp._entity[1][0];
+  x3 = xp._entity[2][0];
+
+}
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

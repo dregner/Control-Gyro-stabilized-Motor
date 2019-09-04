@@ -57,18 +57,24 @@ w(2,2) = 10e-4*w(2,2);
     %Pam = [2.939e-6 0 3.031e-5; 0 1.732e-8 0; 3.031e-5 0 0.0003126]
     Pam = [5.591e-6 0 5.765e-5; 0 1.732e-8 0; 5.765e-5 0 0.0005945];
 %% Variaveis Manipulaveis
+% Condição atual do Filtro / Moto
 
+x0_filtro=[pi/4 0 0];
+x0m = [0 0 0];
 %Ruido w e v
-w = 1e-6*eye(3); w(1,1) = 1e-0*w(1,1); w(2,2) = 1e-0*w(2,2); w(3,3) = 1e-0*w(2,2);
-v = 1e-6*eye(2); v(1,1) = 1e-0*v(1,1); v(2,2) = 1e-0*v(2,2);
-Pam = 1e-6*eye(3); % Matriz covariancia
 
-Q = 1e-3
-R = 1e-3
+w = 1e-4*eye(3);% w(1,1) = 1e-0*w(1,1); w(2,2) = 1e-0*w(2,2); w(3,3) = 1e-0*w(2,2);
+v = 1e-7*eye(2);% v(1,1) = 1e-0*v(1,1); v(2,2) = 1e-0*v(2,2);
+Pam = 1e8*eye(3); % Matriz covariancia
 
-% Ruidos para extended Kalman Filter
-w1 = R*eye(3); w1(1,1) = 1e-0*w1(1,1); w1(2,2) = 1e-0*w1(2,2); w1(3,3) = 1e-0*w1(2,2);
-v1= Q*eye(2); v1(1,1) = 1e-0*v1(1,1); v1(2,2) = 1e-0*v1(2,2);
+Q = 1e-70;
+R = 1e-6;
+
+% Ruidos para extended Kalman 
+%Filter
+
+w1 = R*eye(3); w1(1,1) = 6*w1(1,1); w1(2,2) = 3*w1(2,2); w1(3,3) = 10*w1(2,2);
+v1= Q*eye(2); v1(1,1) = 2*v1(1,1); v1(2,2) = 3*v1(2,2);
 % Saturacoes observador EKF
 sat_x1o = 10000;
 sat_x2o = 10000;

@@ -8,7 +8,7 @@ Av = 0.075; % Altura veículo [m]
 Lv = 0.19; % Largura veículo [m]
 Dg = 0.06; % Distância entre centro de massa do giro e eixo de rotação [m]
 Dv = 0.045; % Distância entre centro de massa do veículo e eixo de rotação
-Omega = 6500*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
+Omega = 7200*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
 g = 9.81; % Gravidade [m/s^2] 
 IG11 = (Mg*(Rg^2)/4) + (Mg*(Ag^2)/12); % Algum momento de inercia
 IG33 = Mg*(Rg^2)/2;

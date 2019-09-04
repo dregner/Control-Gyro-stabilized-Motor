@@ -5,17 +5,17 @@
 // Altere os valores conforme a montagem do seu projeto
 
 // Pinos
-const int pino_servo = 9;
+const int pino_servo = 8;
 const int pino_giroscopio = 4;
 
 // Parâmetros servo
-const int offset_servo = 85; /* Valor, em graus, que deixa o
+const int offset_servo = 80; /* Valor, em graus, que deixa o
                                 giroscópio paralelo a moto.
                                 Utilizar o programa teste_servo
                                 para determinar o valor.
                              */
-const int servo_maximo = 127; //  Limite superior da atuação do servo
-const int servo_minimo = 47;  //  Limite inferior da atuação do servo
+const int servo_maximo = 120; //  Limite superior da atuação do servo
+const int servo_minimo = 40;  //  Limite inferior da atuação do servo
                               //  Novamente, utilize o arquivo teste_servo
                               //  para determinar o menor e maior valor para atuar
 
@@ -36,9 +36,9 @@ const bool EIXO_X = true; /* A IMU pode ser montada de duas formas,
                                     ao eixo Y da IMU
                            */
                          
-float offset_posicao_x = 0.65;
+float offset_posicao_x = 1;
 float offset_posicao_y = 0.0;
-float offset_velocidade_x = -10.58;
+float offset_velocidade_x = -9;
 float offset_velocidade_y = 0.0; //  Para determinar os valores utilize o programa calibracao_imu
 
 
@@ -54,28 +54,31 @@ const bool inverter_imu = false; //  Análogo ao inverter_direcao_servo. Ajustar
 // x2 -> Posição angular do giroscópio 'theta'
 // x3 -> Velocidade angular 'rho_ponto'
 
+
 //K DISCRETO r = 0.7 Ts = 0.01
+//const int Ts = 10;  // Período de amostragem, em ms.
 //const float K1 = -3.0395;
 //const float K2 = -0.7455;
 //const float K3 = -0.7984;
 
 /*K DISCRETO r = 0.3 Ts = 0.01
-const float K1 = -3.2771;
-const float K2 = -0.9223;
-const float K3 = -0.9714;*/
+ * const int Ts = 10;  // Período de amostragem, em ms.
+  const float K1 = -3.2771;
+  const float K2 = -0.9223;
+  const float K3 = -0.9714;*/
 
 //K DISCRETO r = 0.7 Ts = 0.005
+const int Ts = 5;  // Período de amostragem, em ms.
 const float K1 = -3.4727;
 const float K2 = -0.9386;
 const float K3 = -0.9930;
 
 /*//K DISCRETO r = 0.4 Ts = 0.005
-const float K1 = -3.8102;
-const float K2 = -1.1549;
-const float K3 = -1.2074;*/
+ * const int Ts = 5;  // Período de amostragem, em ms.
+  const float K1 = -3.8102;
+  const float K2 = -1.1549;
+  const float K3 = -1.2074;*/
 
-
-const int Ts = 5;  // Período de amostragem, em ms.
 
 // Opções de visualização
 const bool plotar_referencia = false;
@@ -197,16 +200,8 @@ void observador(){
     u = -K1*x1 -K2*x2 -K3*x3;
 
     theta += (u*dt)/1000.0; //  Converter dt para segundos
-    // Atua
-    atuacao = static_cast<int>((inverter_direcao_servo ? -1 : 1)*kRadianosParaGraus*theta + offset_servo);
-    if (atuacao > servo_maximo) {
-      atuacao = servo_maximo;
-      theta = kGrausParaRadianos*(servo_maximo-offset_servo); //  Não pode deixar theta ficar crescendo!
-    } else if (atuacao < servo_minimo) {
-      atuacao = servo_minimo;
-      theta = kGrausParaRadianos*(servo_minimo-offset_servo);
-    }
-    
+    theta = min(0.7, max(-0.7, theta));
+    atuacao = mapfloat(theta, -0.7, 0.7, 40, 120);
     atuador.write(atuacao);
     
    Rotation rot = imu.GetRotation();
@@ -255,4 +250,9 @@ void observador(){
     x3 = xe3;
     plot_obs();
     
+}
+
+float mapfloat(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
