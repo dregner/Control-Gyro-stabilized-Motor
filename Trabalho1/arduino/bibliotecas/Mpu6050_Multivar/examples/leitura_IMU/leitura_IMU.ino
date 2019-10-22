@@ -36,7 +36,7 @@ void setup() {
 void loop() {
   /*
    * A utilização da biblioteca é simples. Para atualizar os valores basta
-   * executar o método Update da imu. Os dados estarão disponíveis para uso
+   * executar o método Update da arduino_imu. Os dados estarão disponíveis para uso
    * através dos métodos GetVelocity, GetRotation e GetRawReadings
    */
   imu.Update();

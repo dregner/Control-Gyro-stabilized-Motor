@@ -33,10 +33,10 @@ A = double(subs(jacobian(f),[x1 x2],[0 0]));
 B = double(subs(u, [x1 x2],[0 0]));
 C = [1 0 0;
     0 1 0 ];
+C = eye(3);
 Dsim = zeros(3,1);
 x0 = [pi/180*45 0 0];
-P1 = [-12.01 -12.02 -12];
-K = place(A,B,P1);
+x0_obs = x0;
 Con = ctrb(A,B)
 rank(Con)
 Obs = obsv(A,C)
@@ -46,27 +46,44 @@ rank(Obs)
 Ts = 0.01;
 [Ad, Bd] = c2d(A,B,Ts);
 
+
 %% LQR for R.L.
 Q = eye(3);
 rf=0.7;
 R=rf*eye(1);
 Kd = dlqr(Ad,Bd,Q,R)
 eig(Ad-Bd*Kd)
-%Kd = place(Ad, Bd, [-0.7239 + 1.0219i,-0.7239 - 1.0219i,1])
 
-%% Ganhos LQG para L
-x0_obs = [pi/180*45 0 0];
+%% Kalman Filter
 
-Q = eye(3);
-ro=0.1;
-R=ro*eye(2)
-Ld = dlqr(Ad',C',Q,R)'
-eig(Ad-Ld*C)
-V1 = 10e-7*eye(3);
-V2 = 50e-7*eye(2);
-rkf = 0.001;
-Ldkf = dlqr(Ad',C', V1, rkf*V2)';
-%Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
+Q = 10e-7*eye(3);
+R = 50e-7*eye(3);
+
+v = wgn(3,3,10e-7)
+
+
+
+
+
+
+
+
+
+
+ 
+ %% Ganhos LQG para L
+% x0_obs = [pi/180*45 0 0];
+% 
+% Q = eye(3);
+% ro=0.1;
+% R=ro*eye(3)
+% Ld = dlqr(Ad',C',Q,R)'
+% eig(Ad-Ld*C)
+% V1 = 10e-7*eye(3);
+% V2 = 50e-7*eye(3);
+% rkf = 0.001;
+% Ldkf = dlqr(Ad',C', V1, rkf*V2)';
+% %Ldkf = place(Ad',C',[-10,-10.001,-10.01])';
 
 %% PLOTS
 % figure
