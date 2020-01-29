@@ -1,6 +1,5 @@
 #include <Wire.h>
 //#include <SoftwareSerial.h>
-#include <math.h>
 #include "imu.h"
 #include <Arduino.h>
 #include <Servo.h>
