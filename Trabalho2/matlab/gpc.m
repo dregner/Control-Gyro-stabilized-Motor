@@ -83,19 +83,20 @@ x3(k) = x3(k-1) + (x3d(k-1)+x3d(k))*sim_step/2;
 end
 
 
-if dt > Ts/sim_step
+    if dt > Ts/sim_step
         dt = 0;
-x=[x1(k);x2(k);x3(k)];
-u(k) = -Kd*x;
-else
-if k == 1
-u(k) = u0;
-else
-u(k) = u(k-1);
-end
+        x=[x1(k);x2(k);x3(k)];
+        u(k) = -Kd*x;
+    else
+    if k == 1
+        u(k) = u0;
+    else
+        u(k) = u(k-1);
+    end
+    end
         end
 
-end
+
 
  
 figure(1)
@@ -155,7 +156,7 @@ ny = size(C,1);
 Am = [A B; zeros(nu,nx) eye(nu,nu)];
 Bm = [B; zeros(nu,nu)];
 Cm = [C zeros(ny,1)];
-%% Inicializa matriz F e H ŷ = F*x+H*du e MATRIZ K
+%% Inicializa matriz F e H ŷ = F(k-1)*x+H*du e MATRIZ K
 F = zeros(ny*nP,nx+nu);
 F0 = Cm;
 
@@ -191,6 +192,13 @@ u_vet = zeros(1,end_sim);
 delta_u = zeros(1,end_sim);
 
 %% MPC codigo
+
+dt = 0;
+x1 = zeros(1,end_sim);
+x2 = zeros(1,end_sim);
+x3 = zeros(1,end_sim);
+u = zeros(1,end_sim);
+
 for k = 1:end_sim
     
 if k == 1
@@ -221,11 +229,16 @@ x_v = [x1(k); x2(k); x3(k); u(k-1)];
 
 end
 
-
     if dt > Ts/sim_step
-            dt = 0;
-            delta_u(k) = K1*(zeros(ny*nP,1)-F*x_v);
-            u(k) = delta_u(k) + u(k-1);
+        dt = 0;
+        delta_u(k) = K1*(zeros(ny*nP,1)-F*x_v);
+        u(k) = delta_u(k) + u(k-1);
+    else
+        if k == 1
+            u(k) = u0;
+        else
+            u(k) = u(k-1);
+        end
     end
 end
 
