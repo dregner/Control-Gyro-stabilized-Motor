@@ -2,34 +2,44 @@ clc
         clear all
         close all
 %% NON LINEAR SYSTEM
-        mV = 0.152;     % Massa do veículo, sem giroscópio [kg]
-mG = 0.15;      % Massa do giroscópio [kg]
-rG = 0.095/2;   % Raio do giroscópio [m]
-aG = 0.006;     % Espessura do giroscópio [m]
-aV = 0.075;     % Altura do veículo [m]
-lV = 0.19;      % Comprimento do veículo [m]
-dG = 0.06;      % Distância entre centro de massa do giroscópio e centro de rotação do veículo [m]
-dV = 0.045;     % Distância entre centro de massa do veículo e o ponto de rotação do veículo [m]
+% Parâmetros do modelo
+Mv = 0.152; % Massa do veículo sem giro [kg]
+Mg = 0.15; % Massa do giro [kg]
+Rg = 0.095/2; % Raio do giro [m]
+Ag = 0.006; % Es  pessura giro [m]
+Av = 0.075; % Altura veículo [m]
+Lv = 0.19; % Largura veículo [m]
+Dg = 0.06; % Distância entre centro de massa do giro e eixo de rotação [m]
+Dv = 0.045; % Distância entre centro de massa do veículo e eixo de rotação
+Omega = 6500*0.10472; % Velocidade de rotação do giro, rpm*conversão = rad/sec
+g = 9.81; % Gravidade [m/s^2] 
+IG11 = (Mg*(Rg^2)/4) + (Mg*(Ag^2)/12); % Algum momento de inercia
+IG33 = Mg*(Rg^2)/2;
+IB11 = Mv*(Av^2+Lv^2)/12; 
+syms x1 x2 x3 u;
+f1 = x3;
+f2 = 0;
+f3 = ((Mv*Dv+Mg*Dg)*g*sin(x1))/(IB11+Mv*(Dv^2)+IG11*(cos(x2)^2)+Mg*(Dg^2)+IG33*((sin(x2))^2));
+f = [f1;f2;f3];
+u1 = 0;
+u2 = 1;
+u3 = (-2*cos(x2)*sin(x2)*x3*(IG33-IG11)-Omega*cos(x2)*IG33)/(IB11+IG11*(cos(x2)^2)+Mv*(Dv^2)+Mg*(Dg^2)+IG33*(sin(x2)^2));
+u=[u1;u2;u3];
 
-omega = 6500*0.10472;   % Velocidade de rotação do giroscópio, RPM*conversão = rad/sec
-g = 9.81;               % Gravidade [m/s^2]
+%% modelo
 
-IG11 = mG*(rG^2)/4 + mG*(aG^2)/12; % Momento de Inércia
-        IG33 = mG*(rG^2)/2;
-IB11 = mV*(aV^2+lV^2)/12;
-
-
-%% LINEAR SYSTEM FOR TS = 5 ms
-A=[1.0013 0 0.0050;
-0 1.0000 0;
-0.5319 0 1.0013];
-B=[-0.001;
-0.005;
--0.3943];
-C=[1 0 0;
-0 1 0;
-0 0 1];
-D=zeros(3,1);
+Am = double(subs(jacobian(f),[x1 x2],[0 0]));
+Bm = double(subs(u, [x1 x2],[0 0]));
+Cm = [1 0 0; 0 1 0];% 0 0 0];
+%Cm = [1 0 0;0 0 0];
+Dmsim = zeros(2,1);
+Ts = 0.005;
+x0 = [pi/4 0 0];
+    
+[Amd, Bmd] = c2d(Am, Bm, Ts);
+A = Amd;
+B = Bmd;
+C = eye(3);
 
 Kd = dlqr(A, B, eye(3),1);
 
@@ -41,9 +51,9 @@ Ts = 0.001;
 end_sim = ceil(tsim/sim_step);
 
 
-x10 = pi/4;
-x20 = 0;
-x30 = 0;
+x10 =x0(1);
+x20 = x0(2);
+x30 = x0(3);
 u0 = 0;
 
 dt = 0;
@@ -65,11 +75,11 @@ x3(k) = x30;
 
 else
 dt = dt+1;
-num_f3 = (mV*dV+mG*dG)*g*sin(x1(k-1));
-den_f3 = IB11+mV*dV^2+mG*dG^2+IG11*cos(x2(k-1))^2+IG33*sin(x2(k-1))^2;
+num_f3 = (Mv*Dv+Mg*Dg)*g*sin(x1(k-1));
+den_f3 = IB11+Mv*Dv^2+Mg*Dg^2+IG11*cos(x2(k-1))^2+IG33*sin(x2(k-1))^2;
 f3 = num_f3/den_f3;
 
-num_u3 = -2*cos(x2(k-1))*sin(x2(k-1))*(IG33-IG11)*x3(k-1)-omega*cos(x2(k-1))*IG33;
+num_u3 = -2*cos(x2(k-1))*sin(x2(k-1))*(IG33-IG11)*x3(k-1)-Omega*cos(x2(k-1))*IG33;
 den_u3 = den_f3;
 u3 = num_u3/den_u3;
 
@@ -88,11 +98,11 @@ end
         x=[x1(k);x2(k);x3(k)];
         u(k) = -Kd*x;
     else
-    if k == 1
-        u(k) = u0;
-    else
-        u(k) = u(k-1);
-    end
+        if k == 1
+            u(k) = u0;
+        else
+            u(k) = u(k-1);
+        end
     end
         end
 
@@ -146,10 +156,10 @@ plot(x3(1:end_sim));
 
 
 %% PARAMETROS CONTROLE
-nP = 5;
-nU = 5;
-Q = 1*eye(3*nP);
-R = 1*eye(nU);
+nP = 2;
+nU = 1;
+R = (10^(-4));
+Q = [1 0 0 ; 0 1 0 ; 0 0 1];
 %% Inicializa Matriz aumentada
 [nx,nu]=size(B);
 ny = size(C,1);
@@ -198,7 +208,9 @@ x1 = zeros(1,end_sim);
 x2 = zeros(1,end_sim);
 x3 = zeros(1,end_sim);
 u = zeros(1,end_sim);
-
+[H1 F1 F2] = quad_pb_mat(A,B,eye(3),nP,Q,R);
+K=(F1'*Q*F1+R)\(F1'*Q);
+K1=K(1:nu,:);
 for k = 1:end_sim
     
 if k == 1
@@ -210,21 +222,26 @@ x_v = [x1(k);x2(k);x3(k); 0];
 
 else
 dt = dt+1;
-num_f3 = (mV*dV+mG*dG)*g*sin(x1(k-1));
-den_f3 = IB11+mV*dV^2+mG*dG^2+IG11*cos(x2(k-1))^2+IG33*sin(x2(k-1))^2;
-f3 = num_f3/den_f3;
-
-num_u3 = -2*cos(x2(k-1))*sin(x2(k-1))*(IG33-IG11)*x3(k-1)-omega*cos(x2(k-1))*IG33;
-den_u3 = den_f3;
-u3 = num_u3/den_u3;
-
-x1d(k) = x3(k-1);
-x2d(k) = u(k-1);
-x3d(k) = f3+u3*u(k-1);
+% num_f3 = (Mv*Dv+Mg*Dg)*g*sin(x1(k-1));
+% den_f3 = IB11+Mv*Dv^2+Mg*Dg^2+IG11*cos(x2(k-1))^2+IG33*sin(x2(k-1))^2;
+% f3 = num_f3/den_f3;
+% 
+% num_u3 = -2*cos(x2(k-1))*sin(x2(k-1))*(IG33-IG11)*x3(k-1)-Omega*cos(x2(k-1))*IG33;
+% den_u3 = den_f3;
+% u3 = num_u3/den_u3;
+% 
+% x1d(k) = x3(k-1);
+% x2d(k) = u(k-1);
+% x3d(k) = f3+u3*u(k-1);
+x1d(k) = A(1,1)*x1(k-1)+A(1,2)*x2(k-1)+A(1,3)*x3(k-1)+B(1,1)*u(k-1);
+x2d(k) = A(2,1)*x1(k-1)+A(2,2)*x2(k-1)+A(2,3)*x3(k-1)+B(2,1)*u(k-1);
+x3d(k) = A(3,1)*x1(k-1)+A(3,2)*x2(k-1)+A(3,3)*x3(k-1)+B(3,1)*u(k-1);
 
 x1(k) = x1(k-1) + (x1d(k-1)+x1d(k))*sim_step/2;
 x2(k) = x2(k-1) + (x2d(k-1)+x2d(k))*sim_step/2;
 x3(k) = x3(k-1) + (x3d(k-1)+x3d(k))*sim_step/2;
+
+
 x_v = [x1(k); x2(k); x3(k); u(k-1)];
 
 end
